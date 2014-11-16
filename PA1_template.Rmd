@@ -8,18 +8,141 @@ output:
 
 ## Loading and preprocessing the data
 
+Download the activity dataset - https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 
+For this analysis we will be utiizing the ggplot2 and plyr packages.
+
+```{r}
+library(ggplot2)
+library(plyr)
+getwd()
+rawData <- read.table("activity.csv"), header=TRUE, sep=",")
+cleanData <- rawData[complete.cases(rawData),] 
+
+```
 
 ## What is mean total number of steps taken per day?
 
+Below is histogram of the total steps taken per day.
+
+```{r}
+#histogram for total stpes by day
+print(qplot(date, data = cleanData, weight = steps) +
+        geom_histogram(fill="firebrick4")  +
+        scale_y_continuous("Steps") +
+        labs(x = "Date") +      
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+        labs(title = "Total Steps by Day"))
+        
+```
+Figure 1
+
+Here is the mean and median vales for each day.
+
+```{r}
+ddply(cleanData,~date,summarise,mean=mean(steps),median=median(steps))
+
+```
+Figure 2
 
 
 ## What is the average daily activity pattern?
 
+Below is a time series plot of averge steps taken at each interval over all days.
+Note - the interval measurement is representative of 24hour time (e.g. 1600 represents 4:00pm)
+
+```{r}
+ggplot(cleanData, aes(interval,steps)) +
+        stat_summary(fun.y = 'mean', colour = 'red', size=1, geom = 'line') +
+        scale_x_continuous("Interval", limits = c(0, 2400), breaks = seq(0,2400,200))  +
+        labs(y = "Steps") +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+```
+Figure 3
+
+The 5 minute interval that contains the maximum number of steps is
+
+```{r}
+##interval with maximum steps
+sumData <- ddply(cleanData, c("interval"), summarize, sumSteps = sum(steps))
+orderData <- sumData[order(-sumData$sumSteps),]
+orderData[1,]
+
+```
+Figure 4
 
 
 ## Imputing missing values
 
+Below is the number of records with NAs
 
+```{r}
+#count of all na rows
+sum(!complete.cases(rawData))
+
+```
+Figure 5
+
+The strategy to fill in all missing values will be to replace the missing step value with the average steps taken at that interval over all days.
+
+Creation of new dataset with missing data filled in using the above strategy
+
+```{r}
+impute.mean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
+imputeData <- ddply(rawData, ~ interval, transform, steps = impute.mean(steps))
+imputeData <- imputeData[order(imputeData$interval), ]
+
+```
+
+Below is a re-plot of the historgram from figure 1 with the newly created dataset with missing data filled in.
+
+```{r}
+print(qplot(date, data = imputeData, weight = steps) +
+              geom_histogram(fill="firebrick4")  +
+              scale_y_continuous("Steps") +
+              labs(x = "Date") +      
+              theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+              labs(title = "Total Steps by Day")
+```
+Figure 6
+
+Note the addition of steps on Oct 1, 2012.
+
+
+Here is the calculation of mean and median values against the new created dataset with missing data filled in.
+
+```{r}
+ddply(imputeData,~date,summarise,mean=mean(steps),median=median(steps))
+```
+Figure 7
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+Adding a weekday/weekend facture to the imputedData..
+
+```{r}
+#add weekday, weekend factor to imputeData
+imputeData$wday <- as.factor(ifelse(weekdays(as.Date(imputeData$date)) %in% c("Saturday","Sunday"), "Weekend", "Weekday"))
+```
+
+Below is a time series plot of averge steps taken at each interval over all days, split by weekday and weekend days
+
+Note - the interval measurement is representative of 24hour time (e.g. 1600 represents 4:00pm)
+
+```{r}
+#plot line graph for mean steps by interval for each weekend and weekday
+ggplot(imputeData, aes(interval,steps)) +
+        facet_grid(wday ~ .) +
+        stat_summary(fun.y = 'mean', colour = 'red', size=1, geom = 'line') +
+        scale_x_continuous("Interval", limits = c(0, 2400), breaks = seq(0,2400,200))  +
+        labs(y = "Steps") + 
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+```
+Figure 8
+
+
+Weekday steps are higher in the early mornings and lowerer throughout the mid-morning and early-afternoon.  Prehaps this could be people going to work and remaining fairly stationary while at their desks.  Weekend steps start increasing later in the morning, could be people sleeping in those days.
+
+
