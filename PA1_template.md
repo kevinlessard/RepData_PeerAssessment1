@@ -103,6 +103,7 @@ Table 1
 ## What is the average daily activity pattern?
 
 Below is a time series plot of averge steps taken at each interval over all days.
+
 Note - the interval measurement is representative of 24hour time (e.g. 1600 represents 4:00pm)
 
 
@@ -254,7 +255,7 @@ Overall the total daily averages remained similar to the original. There were no
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-Adding a weekday/weekend facture to the imputedData..
+Adding a weekday/weekend factor to the imputedData..
 
 
 ```r
@@ -281,6 +282,6 @@ ggplot(imputeData, aes(interval,steps)) +
 Figure 4
 
 
-Weekday steps are higher in the early mornings and lowerer throughout the mid-morning and early-afternoon.  Prehaps this could be people going to work and remaining fairly stationary.  Weekend steps start increasing later in the morning, could be people sleeping later on the weekend.
+Weekday steps are higher in the early mornings and lower throughout the mid-mornings and early-afternoons.  Prehaps this could be people going to work and remaining stationary during work hours.  Weekend steps start increasing later in the morning... could be people sleeping later on the weekend.
 
 
