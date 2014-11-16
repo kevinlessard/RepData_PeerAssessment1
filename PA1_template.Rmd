@@ -25,7 +25,7 @@ cleanData <- rawData[complete.cases(rawData),]
 
 Below is histogram of the total steps taken per day.
 
-```{r}
+```{r fig.width=10}
 #histogram for total stpes by day
 qplot(date, data = cleanData, weight = steps) +
         geom_histogram(fill="firebrick4")  +
@@ -97,13 +97,13 @@ imputeData <- imputeData[order(imputeData$interval), ]
 
 Below is a re-plot of the historgram from figure 1 with the newly created dataset with missing data filled in.
 
-```{r}
-print(qplot(date, data = imputeData, weight = steps) +
+```{r fig.width=10}
+qplot(date, data = imputeData, weight = steps) +
               geom_histogram(fill="firebrick4")  +
               scale_y_continuous("Steps") +
               labs(x = "Date") +      
               theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
-              labs(title = "Total Steps by Day"))
+              labs(title = "Total Steps by Day")
 ```
 Figure 3
 

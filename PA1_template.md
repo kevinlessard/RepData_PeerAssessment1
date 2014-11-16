@@ -164,12 +164,12 @@ Below is a re-plot of the historgram from figure 1 with the newly created datase
 
 
 ```r
-print(qplot(date, data = imputeData, weight = steps) +
+qplot(date, data = imputeData, weight = steps) +
               geom_histogram(fill="firebrick4")  +
               scale_y_continuous("Steps") +
               labs(x = "Date") +      
               theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
-              labs(title = "Total Steps by Day"))
+              labs(title = "Total Steps by Day")
 ```
 
 ![plot of chunk unnamed-chunk-8](./PA1_template_files/figure-html/unnamed-chunk-8.png) 
